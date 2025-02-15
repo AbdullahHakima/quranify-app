@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import Index from "./pages/Index";
 import Kajian from "./pages/Kajian";
 import Doa from "./pages/Doa";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { initializePrayerTimes } from "./utils/initializePrayerTimes";
 
@@ -29,7 +30,7 @@ const App = () => {
             <Route path="/prayer" element={<Index />} />
             <Route path="/kajian" element={<Kajian />} />
             <Route path="/doa" element={<Doa />} />
-            <Route path="/profile" element={<Index />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
