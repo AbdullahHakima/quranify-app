@@ -39,6 +39,72 @@ export type Database = {
         }
         Relationships: []
       }
+      doa: {
+        Row: {
+          arabic_text: string
+          category: string | null
+          created_at: string
+          id: string
+          tags: string[] | null
+          title: string
+          translation: string
+        }
+        Insert: {
+          arabic_text: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          title: string
+          translation: string
+        }
+        Update: {
+          arabic_text?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          title?: string
+          translation?: string
+        }
+        Relationships: []
+      }
+      kajian: {
+        Row: {
+          category: string | null
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          image_url: string | null
+          location: string
+          speaker: string
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          speaker: string
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          speaker?: string
+          title?: string
+        }
+        Relationships: []
+      }
       prayer_times: {
         Row: {
           created_at: string
