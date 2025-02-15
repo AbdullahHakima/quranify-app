@@ -9,7 +9,90 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      daily_prayers: {
+        Row: {
+          arabic_text: string | null
+          category: string
+          created_at: string
+          icon: string | null
+          id: string
+          title: string
+          translation: string | null
+        }
+        Insert: {
+          arabic_text?: string | null
+          category: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          title: string
+          translation?: string | null
+        }
+        Update: {
+          arabic_text?: string | null
+          category?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          title?: string
+          translation?: string | null
+        }
+        Relationships: []
+      }
+      prayer_times: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          location: string
+          prayer_name: string
+          prayer_time: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          location: string
+          prayer_name: string
+          prayer_time: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          location?: string
+          prayer_name?: string
+          prayer_time?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          location: string
+          notification_enabled: boolean | null
+          theme: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location: string
+          notification_enabled?: boolean | null
+          theme?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string
+          notification_enabled?: boolean | null
+          theme?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

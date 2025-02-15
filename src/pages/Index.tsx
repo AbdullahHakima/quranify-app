@@ -1,21 +1,60 @@
 
 import { Bell, MapPin } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 const Index = () => {
-  const prayerTimes = [
-    { name: "Subuh", time: "03:53" },
-    { name: "Dzuhur", time: "11:20" },
-    { name: "Ashar", time: "14:21" },
-    { name: "Maghrib", time: "17:26" },
-    { name: "Isya'", time: "18:34" },
-  ];
+  const today = new Date();
+  const formattedDate = format(today, "yyyy-MM-dd");
 
-  const dailyPrayers = [
-    { icon: "🍽️", title: "Prayer for eating" },
-    { icon: "📚", title: "Study prayer" },
-    { icon: "🌙", title: "Bedtime prayers" },
-  ];
+  const { data: prayerTimes, isLoading: isLoadingPrayers } = useQuery({
+    queryKey: ["prayerTimes", formattedDate],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("prayer_times")
+        .select("*")
+        .eq("date", formattedDate)
+        .order("prayer_time");
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: dailyPrayers, isLoading: isLoadingDailyPrayers } = useQuery({
+    queryKey: ["dailyPrayers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("daily_prayers")
+        .select("*")
+        .limit(3);
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: userPreferences } = useQuery({
+    queryKey: ["userPreferences"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from("user_preferences")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error && error.code !== "PGRST116") throw error;
+      return data;
+    },
+  });
+
+  const nextPrayer = prayerTimes?.[0];
+  const location = userPreferences?.location || "Malang, East Java";
 
   return (
     <div className="min-h-screen bg-white pb-16">
@@ -23,7 +62,7 @@ const Index = () => {
       <header className="bg-white p-4 flex justify-between items-center">
         <div className="flex items-center">
           <MapPin className="text-primary" size={20} />
-          <span className="ml-2 text-sm font-medium">Malang, East Java</span>
+          <span className="ml-2 text-sm font-medium">{location}</span>
         </div>
         <Bell size={20} className="text-gray-600" />
       </header>
@@ -37,8 +76,12 @@ const Index = () => {
           </h2>
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-4xl font-bold">17:21</h3>
-              <p className="text-sm text-gray-600">Maghrib less than 05:23</p>
+              <h3 className="text-4xl font-bold">
+                {nextPrayer?.prayer_time?.slice(0, 5) || "--:--"}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {nextPrayer?.prayer_name || "Loading..."} is next
+              </p>
             </div>
           </div>
         </div>
@@ -46,15 +89,23 @@ const Index = () => {
         {/* Prayer Times */}
         <div className="bg-white rounded-2xl shadow-sm border mb-6">
           <div className="grid grid-cols-5 gap-2 p-4">
-            {prayerTimes.map((prayer) => (
-              <div
-                key={prayer.name}
-                className="flex flex-col items-center text-center"
-              >
-                <span className="text-xs text-gray-600">{prayer.name}</span>
-                <span className="text-sm font-medium mt-1">{prayer.time}</span>
-              </div>
-            ))}
+            {isLoadingPrayers ? (
+              <div className="col-span-5 text-center py-4">Loading...</div>
+            ) : (
+              prayerTimes?.map((prayer) => (
+                <div
+                  key={prayer.id}
+                  className="flex flex-col items-center text-center"
+                >
+                  <span className="text-xs text-gray-600">
+                    {prayer.prayer_name}
+                  </span>
+                  <span className="text-sm font-medium mt-1">
+                    {prayer.prayer_time.slice(0, 5)}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -65,15 +116,19 @@ const Index = () => {
             <button className="text-primary text-sm">See All</button>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            {dailyPrayers.map((prayer) => (
-              <div
-                key={prayer.title}
-                className="bg-white p-4 rounded-xl border flex flex-col items-center text-center"
-              >
-                <span className="text-2xl mb-2">{prayer.icon}</span>
-                <span className="text-xs text-gray-600">{prayer.title}</span>
-              </div>
-            ))}
+            {isLoadingDailyPrayers ? (
+              <div className="col-span-3 text-center py-4">Loading...</div>
+            ) : (
+              dailyPrayers?.map((prayer) => (
+                <div
+                  key={prayer.id}
+                  className="bg-white p-4 rounded-xl border flex flex-col items-center text-center"
+                >
+                  <span className="text-2xl mb-2">{prayer.icon}</span>
+                  <span className="text-xs text-gray-600">{prayer.title}</span>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </main>
